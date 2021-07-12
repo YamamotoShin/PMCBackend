@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace PMCBackend.DropBox
 {
-    public class DropBoxClient
+	public class DropBoxClient
 	{
-		private static class MediaType 
+		private static class MediaType
 		{
 			public static readonly string Json = "application/json";
 			public static readonly string Stream = "application/octet-stream";
@@ -20,7 +20,7 @@ namespace PMCBackend.DropBox
 		private readonly HttpClient m_HttpClient;
 		private readonly string AppKey;
 		private readonly string AppSecret;
-        private string AccessToken { get; set; } = string.Empty;
+		private string AccessToken { get; set; } = string.Empty;
 
 		public DropBoxClient(string appKey, string appSecret)
 		{
@@ -29,13 +29,13 @@ namespace PMCBackend.DropBox
 			m_HttpClient = new HttpClient();
 		}
 
-		public DropBoxClient SetAccessToken(string accessToken) 
+		public DropBoxClient SetAccessToken(string accessToken)
 		{
 			AccessToken = accessToken;
 			return this;
-		} 
+		}
 
-		private async Task<string> GetResponseContent(HttpResponseMessage response) 
+		private async Task<string> GetResponseContent(HttpResponseMessage response)
 		{
 			var statusCode = (int)response.StatusCode;
 			var responseContent = await response.Content.ReadAsStringAsync();
@@ -87,7 +87,7 @@ namespace PMCBackend.DropBox
 			throw new Exception();
 		}
 
-		public async Task<Response.TokenFromOauth1> TokenFromOauth1() 
+		public async Task<Response.TokenFromOauth1> TokenFromOauth1()
 		{
 			var httpRequest = new HttpRequestMessage
 			{
@@ -95,7 +95,7 @@ namespace PMCBackend.DropBox
 				RequestUri = new Uri("https://api.dropboxapi.com/2/auth/token/from_oauth1"),
 			};
 			httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes($"{AppKey}:{AppSecret}")));
-			var requestContent = Serialize(new Request.TokenFromOauth1 
+			var requestContent = Serialize(new Request.TokenFromOauth1
 			{
 				oauth1_token = AppKey,
 				oauth1_token_secret = AppSecret
@@ -140,7 +140,7 @@ namespace PMCBackend.DropBox
 				RequestUri = new Uri("https://api.dropboxapi.com/2/users/get_current_account"),
 			};
 			httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AccessToken);
-			
+
 			var response = await m_HttpClient.SendAsync(httpRequest);
 			var responseContent = await GetResponseContent(response);
 
@@ -215,9 +215,9 @@ namespace PMCBackend.DropBox
 			var request = new Request.Download { path = dropBoxFilePath };
 			var content = Serialize(request);
 			httpRequest.Headers.Add("Dropbox-API-Arg", content);
-			
+
 			var response = await m_HttpClient.SendAsync(httpRequest);
-			if (response.StatusCode != System.Net.HttpStatusCode.OK) 
+			if (response.StatusCode != System.Net.HttpStatusCode.OK)
 			{
 				return false;
 			}
@@ -280,15 +280,15 @@ namespace PMCBackend.DropBox
 		//}
 
 		public async Task<string> Upload()
-        {
-            var url = "https://content.dropboxapi.com/2/files/upload";
-            var httpRequest = new HttpRequestMessage
-            {
-                Method = HttpMethod.Post,
-                RequestUri = new Uri(url),
-            };
-            httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AccessToken);
-			var parameter = Serialize(new Request.Upload 
+		{
+			var url = "https://content.dropboxapi.com/2/files/upload";
+			var httpRequest = new HttpRequestMessage
+			{
+				Method = HttpMethod.Post,
+				RequestUri = new Uri(url),
+			};
+			httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AccessToken);
+			var parameter = Serialize(new Request.Upload
 			{
 				path = $"/{DateTime.Now:yyyyMMddHHmmss}.txt",
 				mode = "add",
@@ -318,24 +318,24 @@ namespace PMCBackend.DropBox
 			}
 		}
 
-        public async Task<string> UploadSessionStart(bool close = false)
+		public async Task<string> UploadSessionStart(bool close = false)
 		{
-            var url = "https://content.dropboxapi.com/2/files/upload_session/start";
-            var httpRequest = new HttpRequestMessage
-            {
-                Method = HttpMethod.Post,
-                RequestUri = new Uri(url),
-            };
-            httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AccessToken);
+			var url = "https://content.dropboxapi.com/2/files/upload_session/start";
+			var httpRequest = new HttpRequestMessage
+			{
+				Method = HttpMethod.Post,
+				RequestUri = new Uri(url),
+			};
+			httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AccessToken);
 			var requestContent = Serialize(new Request.UploadSessionStart { close = close });
-            httpRequest.Headers.Add("Dropbox-API-Arg", requestContent);
+			httpRequest.Headers.Add("Dropbox-API-Arg", requestContent);
 			httpRequest.Headers.Add("Content-Type", MediaType.Stream);
 			httpRequest.Content = new ByteArrayContent(Encoding.UTF8.GetBytes("hogehoge"));
-			
+
 			var response = await m_HttpClient.SendAsync(httpRequest);
-			
+
 			var statusCode = (int)response.StatusCode;
-			if (statusCode == 200) 
+			if (statusCode == 200)
 			{
 				var responseContent = await response.Content.ReadAsStringAsync();
 				return responseContent;
