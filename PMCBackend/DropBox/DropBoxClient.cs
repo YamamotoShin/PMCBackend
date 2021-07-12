@@ -261,7 +261,10 @@ namespace PMCBackend.DropBox
 		/// </summary>
 		/// <param name="localFilePath">ローカルファイルパス</param>
 		/// <param name="dropBoxFilePath">ドロップボックス上のファイルパス</param>
-		/// <returns></returns>
+		/// <returns>
+		/// <para>true:アップロード成功</para>
+		/// <para>false:アップロード失敗</para>
+		/// </returns>
 		public async Task<bool> Upload(string localFilePath, string dropBoxFilePath)
 		{
 			var url = "https://content.dropboxapi.com/2/files/upload";
@@ -282,7 +285,7 @@ namespace PMCBackend.DropBox
 			httpRequest.Headers.Add("Dropbox-API-Arg", parameter);
 
 			ByteArrayContent byteArrayContent;
-			using (var fileStream = new FileStream(localFilePath, FileMode.Open)) 
+			using (var fileStream = new FileStream(localFilePath, FileMode.Open))
 			{
 				byteArrayContent = new ByteArrayContent(await GetStreamBytes(fileStream));
 			}
