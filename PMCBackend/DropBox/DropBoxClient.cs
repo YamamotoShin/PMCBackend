@@ -195,24 +195,46 @@ namespace PMCBackend.DropBox
 			return listFolder;
 		}
 
-		public async Task<string> Download(string path)
+		/// <summary>
+		/// ダウンロード
+		/// </summary>
+		/// <param name="dropBoxFilePath">ドロップボックス上のファイルパス</param>
+		/// <param name="localFilePath">ローカルファイルのパス</param>
+		/// <returns>
+		/// <para>true:ダウンロード成功</para>
+		/// <para>false:ダウンロード失敗</para>
+		/// </returns>
+		public async Task<bool> Download(string dropBoxFilePath, string localFilePath)
 		{
 			var httpRequest = new HttpRequestMessage
 			{
 				Method = HttpMethod.Post,
-				RequestUri = new Uri("https://api.dropboxapi.com/2/file_requests/delete"),
+				RequestUri = new Uri("https://content.dropboxapi.com/2/files/download"),
 			};
 			httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AccessToken);
-			var request = new Request.Download { path = path };
+			var request = new Request.Download { path = dropBoxFilePath };
 			var content = Serialize(request);
 			httpRequest.Headers.Add("Dropbox-API-Arg", content);
-			//var requestContent = new StringContent(content, Encoding.UTF8, MediaType.Json);
-			//httpRequest.Content = requestContent;
-
+			
 			var response = await m_HttpClient.SendAsync(httpRequest);
-			var responseContent = await GetResponseContent(response);
+			if (response.StatusCode != System.Net.HttpStatusCode.OK) 
+			{
+				return false;
+			}
 
-			throw new NotImplementedException();
+			using (var stream = await response.Content.ReadAsStreamAsync())
+			using (var memoryStream = new MemoryStream())
+			{
+				while (true)
+				{
+					var buffer = new byte[256];
+					int readSize = await stream.ReadAsync(buffer, 0, buffer.Length);
+					if (readSize > 0) memoryStream.Write(buffer, 0, readSize);
+					else break;
+				}
+				File.WriteAllBytes(localFilePath, memoryStream.ToArray());
+			}
+			return true;
 		}
 
 		public async Task<Response.DeleteV2> DeleteV2(string path)
