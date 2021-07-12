@@ -332,6 +332,27 @@ namespace PMCBackend.DropBox
 		}
 
 		/// <summary>
+		/// ストリームからバイトデータを取得
+		/// </summary>
+		/// <param name="stream">ストリーム</param>
+		/// <param name="bufferSize">バッファーサイズ</param>
+		/// <returns>バイトデータ</returns>
+		private async Task<byte[]> GetStreamBytes(Stream stream, int bufferSize = 256)
+		{
+			using (var memoryStream = new MemoryStream())
+			{
+				while (true)
+				{
+					var buffer = new byte[bufferSize];
+					int readSize = await stream.ReadAsync(buffer, 0, buffer.Length);
+					if (readSize > 0) memoryStream.Write(buffer, 0, readSize);
+					else break;
+				}
+				return memoryStream.ToArray();
+			}
+		}
+
+		/// <summary>
 		/// シリアライザ
 		/// </summary>
 		/// <typeparam name="T">変換前のクラス</typeparam>
