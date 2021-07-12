@@ -258,27 +258,6 @@ namespace PMCBackend.DropBox
 			return delete;
 		}
 
-		////public async Task<Response.FileRequest> List(ulong limit)
-		//public async Task<string> List(ulong limit)
-		//{
-		//	var httpRequest = new HttpRequestMessage
-		//	{
-		//		Method = HttpMethod.Post,
-		//		RequestUri = new Uri("https://api.dropboxapi.com/2/file_requests/list_v2"),
-		//	};
-
-		//	httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AccessToken);
-		//	var request = new Request.FileRequest { limit = limit };
-		//	var content = Serialize(request);
-		//	var requestContent = new StringContent(content, Encoding.UTF8, MediaType.Json);
-		//	httpRequest.Content = requestContent;
-
-		//	var response = await m_HttpClient.SendAsync(httpRequest);
-		//	var responseContent = await GetResponseContent(response);
-		//	var fileRequests = Deserialize<Response.FileRequest>(responseContent);
-		//	return responseContent;
-		//}
-
 		public async Task<string> Upload()
 		{
 			var url = "https://content.dropboxapi.com/2/files/upload";
