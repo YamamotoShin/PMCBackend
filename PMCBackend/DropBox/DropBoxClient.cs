@@ -223,16 +223,8 @@ namespace PMCBackend.DropBox
 			}
 
 			using (var stream = await response.Content.ReadAsStreamAsync())
-			using (var memoryStream = new MemoryStream())
 			{
-				while (true)
-				{
-					var buffer = new byte[256];
-					int readSize = await stream.ReadAsync(buffer, 0, buffer.Length);
-					if (readSize > 0) memoryStream.Write(buffer, 0, readSize);
-					else break;
-				}
-				File.WriteAllBytes(localFilePath, memoryStream.ToArray());
+				File.WriteAllBytes(localFilePath, await GetStreamBytes(stream));
 			}
 			return true;
 		}
@@ -284,19 +276,10 @@ namespace PMCBackend.DropBox
 			httpRequest.Headers.Add("Dropbox-API-Arg", parameter);
 
 			ByteArrayContent byteArrayContent;
-			using (var fileStream = new FileStream(localFilePath, FileMode.Open))
-			using (var memoryStream = new MemoryStream())
+			using (var fileStream = new FileStream(localFilePath, FileMode.Open)) 
 			{
-				while (true)
-				{
-					var buffer = new byte[256];
-					int readSize = await fileStream.ReadAsync(buffer, 0, buffer.Length);
-					if (readSize > 0) memoryStream.Write(buffer, 0, readSize);
-					else break;
-				}
-				byteArrayContent = new ByteArrayContent(memoryStream.ToArray());
+				byteArrayContent = new ByteArrayContent(await GetStreamBytes(fileStream));
 			}
-
 			httpRequest.Content = byteArrayContent;
 			httpRequest.Content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
 
