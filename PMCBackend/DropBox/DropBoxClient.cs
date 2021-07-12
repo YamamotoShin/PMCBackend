@@ -17,22 +17,28 @@ namespace PMCBackend.DropBox
 			public static readonly string Stream = "application/octet-stream";
 		}
 
+		/// <summary>
+		/// Httpクライアント
+		/// </summary>
 		private readonly HttpClient m_HttpClient;
-		private readonly string AppKey;
-		private readonly string AppSecret;
-		private string AccessToken { get; set; } = string.Empty;
 
-		public DropBoxClient(string appKey, string appSecret)
-		{
-			AppKey = appKey;
-			AppSecret = appSecret;
-			m_HttpClient = new HttpClient();
-		}
+		/// <summary>
+		/// アクセストークン
+		/// </summary>
+		private string AccessToken { get; set; }
 
-		public DropBoxClient SetAccessToken(string accessToken)
+		/// <summary>
+		/// アクセストークンを設定
+		/// </summary>
+		/// <param name="accessToken">アクセストークン</param>
+		public DropBoxClient(string accessToken)
 		{
+			if (string.IsNullOrWhiteSpace(accessToken))
+			{
+				throw new ArgumentNullException(nameof(accessToken));
+			}
 			AccessToken = accessToken;
-			return this;
+			m_HttpClient = new HttpClient();
 		}
 
 		private async Task<string> GetResponseContent(HttpResponseMessage response)
@@ -87,18 +93,18 @@ namespace PMCBackend.DropBox
 			throw new Exception();
 		}
 
-		public async Task<Response.TokenFromOauth1> TokenFromOauth1()
+		public async Task<Response.TokenFromOauth1> TokenFromOauth1(string appKey, string appSecret)
 		{
 			var httpRequest = new HttpRequestMessage
 			{
 				Method = HttpMethod.Post,
 				RequestUri = new Uri("https://api.dropboxapi.com/2/auth/token/from_oauth1"),
 			};
-			httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes($"{AppKey}:{AppSecret}")));
+			httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes($"{appKey}:{appSecret}")));
 			var requestContent = Serialize(new Request.TokenFromOauth1
 			{
-				oauth1_token = AppKey,
-				oauth1_token_secret = AppSecret
+				oauth1_token = appKey,
+				oauth1_token_secret = appSecret
 			});
 			httpRequest.Content = new StringContent(requestContent, Encoding.UTF8, MediaType.Json);
 			var response = await m_HttpClient.SendAsync(httpRequest);
@@ -110,7 +116,7 @@ namespace PMCBackend.DropBox
 			return tokenFromOauth1;
 		}
 
-		public async Task<Response.OAuth2Token> OAuth2Token(string accessCode)
+		public async Task<Response.OAuth2Token> OAuth2Token(string appKey, string appSecret, string accessCode)
 		{
 			var parameters = await new FormUrlEncodedContent(new Dictionary<string, string>()
 			{
@@ -122,7 +128,7 @@ namespace PMCBackend.DropBox
 				Method = HttpMethod.Post,
 				RequestUri = new Uri($"https://api.dropbox.com/oauth2/token?{parameters}"),
 			};
-			httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes($"{AppKey}:{AppSecret}")));
+			httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.ASCII.GetBytes($"{appKey}:{appSecret}")));
 			var response = await m_HttpClient.SendAsync(httpRequest);
 			var responseContent = await GetResponseContent(response);
 
