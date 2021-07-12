@@ -258,7 +258,13 @@ namespace PMCBackend.DropBox
 			return delete;
 		}
 
-		public async Task<string> Upload()
+		/// <summary>
+		/// アップロード
+		/// </summary>
+		/// <param name="localFilePath">ローカルファイルパス</param>
+		/// <param name="dropBoxFilePath">ドロップボックス上のファイルパス</param>
+		/// <returns></returns>
+		public async Task<bool> Upload(string localFilePath, string dropBoxFilePath)
 		{
 			var url = "https://content.dropboxapi.com/2/files/upload";
 			var httpRequest = new HttpRequestMessage
@@ -269,7 +275,7 @@ namespace PMCBackend.DropBox
 			httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AccessToken);
 			var parameter = Serialize(new Request.Upload
 			{
-				path = $"/{DateTime.Now:yyyyMMddHHmmss}.txt",
+				path = dropBoxFilePath,
 				mode = "add",
 				autorename = true,
 				mute = false,
@@ -277,24 +283,26 @@ namespace PMCBackend.DropBox
 			});
 			httpRequest.Headers.Add("Dropbox-API-Arg", parameter);
 
-			var b = await new ByteArrayContent(Encoding.UTF8.GetBytes("hogehoge")).ReadAsStringAsync();
-			var requestContent = new StringContent(b, Encoding.UTF8, MediaType.Stream);
-			httpRequest.Content = requestContent;
+			ByteArrayContent byteArrayContent;
+			using (var fileStream = new FileStream(localFilePath, FileMode.Open))
+			using (var memoryStream = new MemoryStream())
+			{
+				while (true)
+				{
+					var buffer = new byte[256];
+					int readSize = await fileStream.ReadAsync(buffer, 0, buffer.Length);
+					if (readSize > 0) memoryStream.Write(buffer, 0, readSize);
+					else break;
+				}
+				byteArrayContent = new ByteArrayContent(memoryStream.ToArray());
+			}
+
+			httpRequest.Content = byteArrayContent;
+			httpRequest.Content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
 
 			var response = await m_HttpClient.SendAsync(httpRequest);
 
-			var statusCode = (int)response.StatusCode;
-			switch (statusCode)
-			{
-				case 200:
-					var responseContent = await response.Content.ReadAsStringAsync();
-					return responseContent;
-				case (int)System.Net.HttpStatusCode.BadRequest:
-					var exceptionMessage = await response.Content.ReadAsStringAsync();
-					throw new Exception(exceptionMessage);
-				default:
-					throw new Exception();
-			}
+			return response.StatusCode == System.Net.HttpStatusCode.OK;
 		}
 
 		public async Task<string> UploadSessionStart(bool close = false)
