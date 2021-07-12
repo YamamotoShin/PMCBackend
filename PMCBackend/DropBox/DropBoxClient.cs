@@ -331,8 +331,14 @@ namespace PMCBackend.DropBox
 			throw new Exception();
 		}
 
-		public string Serialize<T>(T value)
-		where T : class
+		/// <summary>
+		/// シリアライザ
+		/// </summary>
+		/// <typeparam name="T">変換前のクラス</typeparam>
+		/// <param name="value">変換前のインスタンス</param>
+		/// <returns>JSON</returns>
+		private string Serialize<T>(T value)
+			where T : class
 		{
 			using (var memoryStream = new MemoryStream())
 			{
