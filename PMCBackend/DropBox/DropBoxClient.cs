@@ -157,9 +157,9 @@ namespace PMCBackend.DropBox
 		/// <summary>
 		/// 指定したパスのファイルを取得
 		/// </summary>
-		/// <param name="path">DropBox上のパス</param>
-		/// <returns></returns>
-		public async Task<Response.ListFolder> ListFolder(string path = null)
+		/// <param name="dropBoxPath">DropBox上のパス</param>
+		/// <returns>ファイル一覧</returns>
+		public async Task<Response.ListFolder> ListFolder(string dropBoxPath = null)
 		{
 			var httpRequest = new HttpRequestMessage
 			{
@@ -167,7 +167,7 @@ namespace PMCBackend.DropBox
 				RequestUri = new Uri("https://api.dropboxapi.com/2/files/list_folder"),
 			};
 			httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AccessToken);
-			var request = new Request.ListFolder { path = path ?? string.Empty };
+			var request = new Request.ListFolder { path = dropBoxPath ?? string.Empty };
 			var content = Serialize(request);
 			var requestContent = new StringContent(content, Encoding.UTF8, MediaType.Json);
 			httpRequest.Content = requestContent;
