@@ -348,8 +348,14 @@ namespace PMCBackend.DropBox
 			}
 		}
 
-		public T Deserialize<T>(string value)
-		where T : class
+		/// <summary>
+		/// デシリアライザ
+		/// </summary>
+		/// <typeparam name="T">変換後のクラス</typeparam>
+		/// <param name="value">JSON</param>
+		/// <returns>インスタンス</returns>
+		private T Deserialize<T>(string value)
+			where T : class
 		{
 			using (var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes(value)))
 			{
