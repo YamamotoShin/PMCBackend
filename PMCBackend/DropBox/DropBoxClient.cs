@@ -235,7 +235,15 @@ namespace PMCBackend.DropBox
 			return true;
 		}
 
-		public async Task<Response.DeleteV2> DeleteV2(string path)
+		/// <summary>
+		/// 削除
+		/// </summary>
+		/// <param name="dropBoxFilePath">ドロップボックス上のファイルパス</param>
+		/// <returns>
+		/// <para>true:削除成功</para>
+		/// <para>false:削除失敗</para>
+		/// </returns>
+		public async Task<bool> DeleteV2(string dropBoxFilePath)
 		{
 			var httpRequest = new HttpRequestMessage
 			{
@@ -243,17 +251,14 @@ namespace PMCBackend.DropBox
 				RequestUri = new Uri("https://api.dropboxapi.com/2/files/delete_v2"),
 			};
 			httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AccessToken);
-			var request = new Request.DeleteV2 { path = path };
+			var request = new Request.DeleteV2 { path = dropBoxFilePath };
 			var content = Serialize(request);
 			var requestContent = new StringContent(content, Encoding.UTF8, MediaType.Json);
 			httpRequest.Content = requestContent;
 
 			var response = await m_HttpClient.SendAsync(httpRequest);
-			var responseContent = await GetResponseContent(response);
 
-			var delete = Deserialize<Response.DeleteV2>(responseContent);
-
-			return delete;
+			return response.StatusCode == System.Net.HttpStatusCode.OK;
 		}
 
 		/// <summary>
