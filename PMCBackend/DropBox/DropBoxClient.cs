@@ -288,32 +288,6 @@ namespace PMCBackend.DropBox
 			return response.StatusCode == System.Net.HttpStatusCode.OK;
 		}
 
-		public async Task<string> UploadSessionStart(bool close = false)
-		{
-			var url = "https://content.dropboxapi.com/2/files/upload_session/start";
-			var httpRequest = new HttpRequestMessage
-			{
-				Method = HttpMethod.Post,
-				RequestUri = new Uri(url),
-			};
-			httpRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AccessToken);
-			var requestContent = Serialize(new Request.UploadSessionStart { close = close });
-			httpRequest.Headers.Add("Dropbox-API-Arg", requestContent);
-			httpRequest.Headers.Add("Content-Type", MediaType.Stream);
-			httpRequest.Content = new ByteArrayContent(Encoding.UTF8.GetBytes("hogehoge"));
-
-			var response = await m_HttpClient.SendAsync(httpRequest);
-
-			var statusCode = (int)response.StatusCode;
-			if (statusCode == 200)
-			{
-				var responseContent = await response.Content.ReadAsStringAsync();
-				return responseContent;
-			}
-
-			throw new Exception();
-		}
-
 		/// <summary>
 		/// ストリームからバイトデータを取得
 		/// </summary>
