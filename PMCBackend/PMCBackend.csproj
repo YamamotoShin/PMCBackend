@@ -44,25 +44,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DropBox\DropBoxClient.cs" />
-    <Compile Include="DropBox\Request\DeleteV2.cs" />
-    <Compile Include="DropBox\Request\Download.cs" />
-    <Compile Include="DropBox\Request\FileRequest.cs" />
-    <Compile Include="DropBox\Request\ListFolder.cs" />
-    <Compile Include="DropBox\Request\ListFolderContinue.cs" />
-    <Compile Include="DropBox\Request\TokenFromOauth1.cs" />
-    <Compile Include="DropBox\Request\UploadSessionStart.cs" />
-    <Compile Include="DropBox\Request\Upload.cs" />
-    <Compile Include="DropBox\Response\CurrentAccount.cs" />
-    <Compile Include="DropBox\Response\DeleteV2.cs" />
-    <Compile Include="DropBox\Response\Download.cs" />
-    <Compile Include="DropBox\Response\Errors.cs" />
-    <Compile Include="DropBox\Response\FileRequest.cs" />
-    <Compile Include="DropBox\Response\ListFolder.cs" />
-    <Compile Include="DropBox\Response\OAuth2Token.cs" />
-    <Compile Include="DropBox\Response\TokenFromOauth1.cs" />
-    <Compile Include="DropBox\Response\Upload.cs" />
-    <Compile Include="DropBox\Response\UploadSessionStart.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Settings.Designer.cs">

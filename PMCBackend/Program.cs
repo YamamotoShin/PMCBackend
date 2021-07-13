@@ -1,31 +1,22 @@
-﻿using PMCBackend.DropBox;
-using System;
+﻿using System;
+using System.Threading.Tasks;
 
 namespace PMCBackend
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
-            Run();
-            _ = Console.ReadLine();
-        }
-
-        public static async void Run()
-        {
-            var appKey = Properties.Settings.Default.AppKey;
-            var appSecret = Properties.Settings.Default.AppSecret;
-            var accessToken = Properties.Settings.Default.AccessToken;
-            var dropBoxClient = new DropBoxClient(appKey, appSecret).SetAccessToken(accessToken);
             try
             {
-                var file = await dropBoxClient.ListFolder();
+                _ = await Task.Run(() => true);
             }
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
                 Console.WriteLine(e.StackTrace);
             }
+            _ = Console.ReadLine();
         }
     }
 }
