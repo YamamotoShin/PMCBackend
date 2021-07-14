@@ -34,16 +34,6 @@ namespace DropBoxTest
         }
 
         /// <summary>
-        /// ローカルのファイルパスを取得
-        /// </summary>
-        private IEnumerable<string> GetLocalFileName() 
-        {
-            return Directory
-                .GetFiles(nameof(Test01FileUpload), "*")
-                .Select(filePath => Path.GetFileName(filePath));
-        }
-
-        /// <summary>
         /// ファイルアップロードテスト
         /// </summary>
         [TestMethod]
@@ -77,7 +67,9 @@ namespace DropBoxTest
             if (!dropBoxFileNames.Any())
                 Assert.IsTrue(false);
 
-            var localFileNames = GetLocalFileName();
+            var localFileNames = Directory
+                .GetFiles(nameof(Test01FileUpload), "*")
+                .Select(filePath => Path.GetFileName(filePath));
             if (!localFileNames.Any())
                 Assert.IsTrue(false);
 
