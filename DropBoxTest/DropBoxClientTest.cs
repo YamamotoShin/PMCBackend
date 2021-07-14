@@ -80,10 +80,37 @@ namespace DropBoxTest
         /// ファイルダウンロードテスト
         /// </summary>
         [TestMethod]
-        public void Test02FileDownLoadTestAsync()
+        public async Task Test02FileDownLoadTest()
         {
+            var dropBoxFilePaths = await GetDropBoxFilePathsAsync();
+            if (!dropBoxFilePaths.Any()) 
+            {
+                Assert.IsTrue(false);
+            }
 
-            Assert.IsTrue(true);
+            if (Directory.Exists(nameof(Test02FileDownLoadTest)))
+            {
+                Directory.Delete(nameof(Test02FileDownLoadTest), true);
+            }
+            Directory.CreateDirectory(nameof(Test02FileDownLoadTest));
+
+            foreach (var dropBoxFilePath in dropBoxFilePaths) 
+            {
+                var localFilePath = Path.Combine(nameof(Test02FileDownLoadTest), Path.GetFileName(dropBoxFilePath));
+                var result = await _DropBoxClient.Download(dropBoxFilePath, localFilePath);
+                if (!result) 
+                {
+                    Assert.IsTrue(false);
+                }
+            }
+
+            var uploadFileNames = Directory.GetFiles(nameof(Test01FileUpload), "*").Select(filePath => Path.GetFileName(filePath));
+            if (!uploadFileNames.Any())
+            {
+                Assert.IsTrue(false);
+            }
+
+            Assert.IsTrue(uploadFileNames.Select(fileName => Path.Combine(nameof(Test01FileUpload), fileName)).All(filePath => File.Exists(filePath)));
         }
 
         /// <summary>
