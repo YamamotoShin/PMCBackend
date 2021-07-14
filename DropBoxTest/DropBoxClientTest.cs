@@ -72,8 +72,8 @@ namespace DropBoxTest
         [TestMethod]
         public async Task Test02GetList() 
         {
-            var listFolder = await GetDropBoxFilePathsAsync();
-            var dropBoxFileNames = listFolder.Select(x => Path.GetFileName(x)).ToHashSet();
+            var dropBoxFilePaths = await GetDropBoxFilePathsAsync();
+            var dropBoxFileNames = dropBoxFilePaths.Select(x => Path.GetFileName(x)).ToHashSet();
             if (!dropBoxFileNames.Any())
                 Assert.IsTrue(false);
 
@@ -90,6 +90,7 @@ namespace DropBoxTest
         [TestMethod]
         public void Test02FileDownLoadTestAsync()
         {
+
             Assert.IsTrue(true);
         }
 
