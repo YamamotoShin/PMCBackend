@@ -22,7 +22,7 @@ namespace DropBoxTest
         /// ドロップボックスのファイル一覧を取得
         /// </summary>
         /// <param name="path">ドロップボックスのフォルダパス</param>
-        private async Task<IEnumerable<string>> GetDropBoxFilePathsAsync(string path = null) 
+        private async Task<IEnumerable<string>> GetDropBoxFilePathsAsync(string path = null)
         {
             var listFolder = await _DropBoxClient.ListFolder(path);
             var dropBoxFilePaths = listFolder
@@ -40,14 +40,14 @@ namespace DropBoxTest
         public async Task Test01FileUpload()
         {
             var localFilePaths = Directory.GetFiles(nameof(Test01FileUpload), "*");
-            if (!localFilePaths.Any()) 
+            if (!localFilePaths.Any())
             {
                 Assert.IsTrue(false);
             }
             foreach (var localFilePath in localFilePaths)
             {
                 var result = await _DropBoxClient.Upload(localFilePath, $"/{Path.GetFileName(localFilePath)}");
-                if (!result) 
+                if (!result)
                 {
                     Assert.IsTrue(result);
                 }
@@ -60,7 +60,7 @@ namespace DropBoxTest
         /// リスト取得テスト
         /// </summary>
         [TestMethod]
-        public async Task Test02GetList() 
+        public async Task Test02GetList()
         {
             var dropBoxFilePaths = await GetDropBoxFilePathsAsync();
             var dropBoxFileNames = dropBoxFilePaths.Select(x => Path.GetFileName(x)).ToHashSet();
@@ -83,7 +83,7 @@ namespace DropBoxTest
         public async Task Test02FileDownLoadTest()
         {
             var dropBoxFilePaths = await GetDropBoxFilePathsAsync();
-            if (!dropBoxFilePaths.Any()) 
+            if (!dropBoxFilePaths.Any())
             {
                 Assert.IsTrue(false);
             }
@@ -94,11 +94,11 @@ namespace DropBoxTest
             }
             Directory.CreateDirectory(nameof(Test02FileDownLoadTest));
 
-            foreach (var dropBoxFilePath in dropBoxFilePaths) 
+            foreach (var dropBoxFilePath in dropBoxFilePaths)
             {
                 var localFilePath = Path.Combine(nameof(Test02FileDownLoadTest), Path.GetFileName(dropBoxFilePath));
                 var result = await _DropBoxClient.Download(dropBoxFilePath, localFilePath);
-                if (!result) 
+                if (!result)
                 {
                     Assert.IsTrue(false);
                 }
@@ -117,7 +117,7 @@ namespace DropBoxTest
         /// ファイル削除テスト
         /// </summary>
         [TestMethod]
-        public async Task Test03FileDeleteTest() 
+        public async Task Test03FileDeleteTest()
         {
             var dropBoxFilePaths = await GetDropBoxFilePathsAsync();
             if (!dropBoxFilePaths.Any())
